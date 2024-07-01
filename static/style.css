@@ -1,0 +1,242 @@
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    transition: background-color 0.5s, color 0.5s;
+    background: url('./images/background1.jpg');
+}
+h1 {
+    text-align: center;
+}
+.search-container {
+    display: flex;
+    max-width: 50%;
+    margin: 15px auto;
+    justify-content: flex-end;
+}
+.search-container input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+.search-container button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #007bff;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+.search-container button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.menu{
+    display: flex;
+    margin: 15px auto;
+    justify-content: space-between;
+}
+.sortDropdown {
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+.CreateBtn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #007bff;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+.CreateBtn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-gap: 20px;
+}
+@media (max-width: 1080px) {
+    .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+.grid-item-file {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding: 10px;
+    border: 0.5px solid #848484;
+    border-radius: 5px;
+    backdrop-filter: blur(10px);
+}
+.grid-item-folder {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding: 10px;
+    border: 0.5px solid #848484;
+    border-radius: 5px;
+    backdrop-filter: blur(10px);
+}
+.single-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    padding-left: 5%;
+    width: 90%;
+    height:fit-content;
+    box-sizing: content-box;
+}
+.grid-item-file:hover .single-line {
+    overflow: visible;
+    animation: scroll-text 10s  infinite;
+}
+.grid-item-folder:hover .single-line {
+    overflow: visible;
+    animation: scroll-text 10s linear infinite;
+}
+@keyframes scroll-text {
+    from {
+        transform: translateX(0%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+.image-link {
+    text-align: center;
+}
+.image-container {
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+.image-container img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100px;
+    height: auto;
+    background: none;
+    background-color: transparent;
+}
+.download-link {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    margin-top: 5px;
+}
+.downloadBtn {
+    padding: 5px 10px;
+    background-color: #39f73f;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #14c8ff;
+    border-radius: 10px 10px 10px 10px;
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+.delete {
+    display: none;
+    padding: 5px 10px;
+    background-color: #f66161;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #14c8ff;
+    border-radius: 10px 10px 10px 10px;
+    cursor: pointer;
+    position: relative;
+}
+.delete-link{
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    margin-top: 5px;
+}
+.context-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+.context-menu-item-delete {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: none;
+}
+.context-menu-item-download {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.context-menu-item:hover {
+    background-color: #f0f0f0;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: #f3f3f3;
+}
+.progress-bar-fill {
+    height: 20px;
+    background-color: #4caf50;
+    width: 0%;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+}
+.UploadBtn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #007bff;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+.UploadBtn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video File</title>
+    <style>
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .linkcontainer {
+            display: flex; /* Use flexbox */
+            align-items: center; /* Center items vertically */
+        }
+        .linkcontainer .stream-url {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer; /* Show pointer cursor on hover */
+        }
+        .linkcontainer .stream-url:hover {
+            background-color: #e0e0e0; /* Darken background on hover */
+        }
+        .linkcontainer h3 {
+            flex: 1; /* Allow the heading to grow and take available space */
+            margin-right: 100px; /* Add some space between heading and button */
+        }
+        .linkcontainer button {
+            flex-shrink: 0; /* Prevent the button from shrinking */
+        }
+        .linkcontainer button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            border-color: #0056b3; /* Darker blue border on hover */
+        }
+    </style>
+</head>
+<body style="align-text: center;">
+    <h1>Video File</h1>
+    <h3 id="file_name"></h3>
+    <div class="video-container">
+        <video style="align-content: center;" controls>
+            <source src="{{ file_path }}" type="video/{{ file_path.split('.')[-1] }}">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <br>
+    <div class="linkcontainer">
+        <h3>Video Link: <span id="stream_url" class="stream-url">http://{{ipaddress}}:5000{{file_path}}</span></h3>
+        <button onclick="copyText()">Click to copy STREAM URL</button>
+    </div>
+    <br>
+    <button><a href="{{ url_for('show_directory', path='/'.join(request.path.split('/')[1:-1])) }}" style="text-decoration: none;">Back to Directory</a></button>
+
+    <script>
+        var currentURL = window.location.href;
+        var decodedURL = decodeURIComponent(currentURL);
+        var pathArray = decodedURL.split('/');
+        var fileNameWithDir = pathArray[pathArray.length - 1];
+        var fileName = fileNameWithDir.split('\\').pop();
+        fileName = fileName.replace("%20", " ")
+        document.getElementById("file_name").textContent = fileName;
+
+        function copyText() {
+            var textToCopy = document.getElementById("stream_url").innerText;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(function() {
+                    alert('Text copied to clipboard');
+                }).catch(function(err) {
+                    alert('Failed to copy text: ' + err);
+                });
+            } else {
+                var textarea = document.createElement("textarea");
+                textarea.value = textToCopy;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Text copied to clipboard');
+            }
+        }
+    </script>
+</body>
+</html>

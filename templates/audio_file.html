@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        div{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Audio File</h1>
+    <h3 id="file_name"></h3>
+    <div>
+        <audio controls>
+            <source src="{{ file_path }}" type="audio/{{ file_path.split('.')[-1] }}">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+    <br>
+    <button><a href="{{ url_for('show_directory', path='/'.join(request.path.split('/')[1:-1])) }}" style="text-decoration: none;">Back to Directory</a></button>
+
+    <script>
+        var currentURL = window.location.href;
+        var decodedURL = decodeURIComponent(currentURL);
+        var pathArray = decodedURL.split('/');
+        var fileNameWithDir = pathArray[pathArray.length - 1];
+        var fileName = fileNameWithDir.split('\\').pop();
+        fileName = fileName.replace("%20", " ")
+        document.getElementById("file_name").textContent = fileName;
+    </script>
+</body>
+</html>

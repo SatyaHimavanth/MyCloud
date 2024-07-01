@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyCloud Directory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body onload="checkSessionCode()" background>
+    <h1>MyCloud Directory</h1>
+    <div class="search-container">
+        <p style="display:none;" id="secret_code">{{code}}</p>
+        <input type="text" name="search_name" id="search_name" list="search_names" placeholder="Search">
+        <datalist id="search_names">
+            {% for item in items %}
+            <option value="{{ item[0] }}">
+            {% endfor %}
+        </datalist>
+        <button id="search">Search</button>
+    </div>
+
+    <div class="menu">
+        <div>
+            <label for="sortDropdown">Sort By:</label>
+            <select id="sortDropdown" class="sortDropdown">
+                <option value="asc">Name (A-Z)</option>
+                <option value="desc">Name (Z-A)</option>
+            </select>
+        </div>
+
+        <div>
+            <button class="CreateBtn" id="createFolderBtn">Create Folder</button>
+        </div>
+    </div>
+    
+    <div class="grid-container" id="grid-container">
+        {% for name, url, is_file in items %}
+            {% if not is_file %}
+                <div class="grid-item-folder">
+                    <div class="image-link">
+                        <a href="{{ url }}" class="image-container">
+                            <img src="{{ url_for('static', filename='icons/folder.png') }}" class="image" alt="Folder">
+                            <p class="single-line">{{name}}</p>
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        
+        <div id="context-menu" class="context-menu">
+            <div class="context-menu-item-delete" onclick="deleteItem()">Delete</div>
+            <div class="context-menu-item-download" onclick="downloadItem()">Download</div>
+        </div>
+
+        {% for name, url, is_file in items %}
+            {% if is_file %}
+                <div class="grid-item-file">
+                    <div class="image-link">
+                        <a href="{{ url }}" class="image-container">
+                            <img src="{{ url_for('static', filename='icons/file.png') }}" class="image" alt="File">
+                            <p class="single-line">{{name}}</p>
+                        </a>
+                        <button class="downloadBtn"><a href="{{ url_for('download_file', subpath=url[1:]) }}" class="download-link">Download</a></button>
+                        <button class="delete"><a href="{{ url_for('delete_file', subpath=url[1:]) }}" class="delete-link">Delete</a></button>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <br></br>
+
+
+    <button class="UploadBtn" id="uploadBtn">Upload</button>
+    <!-- The Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="uploadForm" method="post" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+                <label for="upload_password">Password:</label>
+                <input type="password" id="upload_password" name="password" required><br><br>
+                <label for="file">Select file:</label>
+                <input type="file" id="file" name="files" multiple required><br><br>
+                <input type="hidden" id="upload_currentPath" name="currentPath" value="{{ request.path }}">
+                <button type="submit">Submit</button>
+            </form>
+            <br>
+            <div class="progress-bar" id="progressBar">
+            </div>
+        </div>
+    </div>
+
+    <div id="createFolderModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form id="createFolderForm" method="post" enctype="multipart/form-data" action="{{ url_for('create_folder') }}">
+                <label for="createfolder_password">Password:</label>
+                <input type="password" id="createfolder_password" name="password" required><br><br>
+                <label for="folderName">Enter folder name:</label>
+                <input type="text" id="folderName" name="folderName" required><br><br>
+                <input type="hidden" id="createfolder_currentPath" name="currentPath" value="{{ request.path }}">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js')}}"></script>
+</body>
+</html>
