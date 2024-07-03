@@ -1,4 +1,5 @@
 from flask import Flask, render_template, send_file, url_for, abort, send_from_directory, request, redirect, jsonify
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import socket
 import sys
@@ -23,22 +24,54 @@ def get_ip_address():
         print(f"Error: {e}")
     return ip_address
 
-app = Flask(__name__)
-
-base_directory = os.path.join(get_working_directory(), 'cloud')
+base_directory = os.path.join(get_working_directory(), 'mycloud')
+base_directory = "C:\\Users\\hp\\Downloads\\Flask"
 
 session_code = None
 
+
+app = Flask(__name__)
+app.secret_key = str(uuid.uuid4())
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # the login view function
+
+# User class
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+# User loader function
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == os.environ['USER_NAME'] and password == os.environ['USER_PASSWORD']:
+            user = User(id=1)
+            login_user(user)
+            next_page = url_for('index')
+            return redirect(next_page)
+    return render_template('user_login.html')
+
 @app.route('/', methods=['GET'])
+@login_required
 def index():
     return render_template('index.html', items=get_items(base_directory), code=session_code)
 
 @app.route('/admin', methods=['GET'])
+@login_required
 def admin():
     return render_template('admin.html')
 
 @app.route('/adminlogin', methods=['POST'])
-def login():
+@login_required
+def admin_login():
     data = request.json
     username = data.get('username')
     password = data.get('password')
@@ -50,6 +83,7 @@ def login():
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
 @app.route('/<path:path>', methods=['GET'])
+@login_required
 def show_directory(path):
     directory_path = os.path.join(base_directory, path)
     if os.path.exists(directory_path) and os.path.isdir(directory_path):
@@ -63,6 +97,7 @@ def show_directory(path):
             return f'Error: {path} not found', 404
 
 @app.route('/download/<path:subpath>', methods=['GET'])
+@login_required
 def download_file(subpath):
     subpath = subpath.replace("%5C", "/")
     subpath = subpath.replace("%20", " ")
@@ -73,22 +108,26 @@ def download_file(subpath):
         return f'Error: File {file_path} not found', 404
     
 @app.route('/delete/<path:subpath>', methods=['GET'])
+@login_required
 def delete_file(subpath):
     subpath = subpath.replace("%5C", "/")
     subpath = subpath.replace("%20", " ")
     file_path = os.path.normpath(os.path.join(base_directory, subpath))
     if os.path.isfile(file_path):
-        os.remove(file_path)
+        # os.remove(file_path)
+        send2trash(file_path)
         return redirect(request.referrer or '/')
     else:
         return f'Error: File {file_path} not found', 404
     
 @app.route('/files/<path:filename>', methods=['GET'])
+@login_required
 def serve_file(filename):
     file_path = os.path.join(base_directory, filename)
     return send_file(file_path)
 
 @app.route('/available_space', methods=['POST'])
+@login_required
 def available_space():
     data = request.get_json()
     free_space = 0
@@ -100,10 +139,10 @@ def available_space():
         free_space = shutil.disk_usage(folder_path)[2]
     else:
         free_space = shutil.disk_usage(os.getcwd())[2]
-    
     return jsonify(free_space=free_space)
 
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload_file():
     password = request.form['password']
     if not isinstance(password, str):
@@ -126,6 +165,7 @@ def upload_file():
     return redirect(request.form['currentPath'])
 
 @app.route('/createFolder', methods=['POST'])
+@login_required
 def create_folder():
     password = request.form['password']
     if not isinstance(password, str):
@@ -157,6 +197,7 @@ def create_folder():
     return redirect(request.form['currentPath'])
 
 @app.route('/delete_folder', methods=['POST'])
+@login_required
 def delete_folder():
     data = request.get_json()
     folder_path = data.get('folderPath')[1:]
@@ -170,6 +211,7 @@ def delete_folder():
         return jsonify(success=False)
 
 @app.route('/download_folder', methods=['POST'])
+@login_required
 def download_folder():
     data = request.get_json()
     folder_path = data.get('folderPath')[1:]
@@ -189,6 +231,12 @@ def download_folder():
     except Exception as e:
         print(f"Error zipping and downloading folder: {e}")
         return jsonify({"success": False, "message": "Failed to zip and download folder"}), 500
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 def render_file(file_path, relative_path):
     ext = os.path.splitext(file_path)[1].lower()

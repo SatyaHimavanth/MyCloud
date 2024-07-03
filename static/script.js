@@ -61,8 +61,6 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         return response.json();
     })
     .then(data => {
-        console.log("Upload files size: "+ upload_size);
-        console.log("Available disk storage: "+ data.free_space);
         if (data.free_space < upload_size) {
             alert('Total files size '+ Number(upload_size/1000000).toFixed(2) +'Mb exceeds available space "'+ Number(data.free_space/1000000).toFixed(2) +'Mb". Cannot upload files!!');
             window.location.reload();
